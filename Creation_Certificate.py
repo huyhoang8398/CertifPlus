@@ -1,4 +1,5 @@
 import subprocess
+import base64
 from typing import Protocol
 import qrcode
 import os
@@ -71,7 +72,7 @@ def create_signature(info):
     file.close()
 
     Process = subprocess.Popen([
-        "openssl dgst -sha256 -sign CA/ecc.server.key.pem ./CA/info.txt > ./CA/signature.sig"
+        "openssl dgst -sha256 -sign CA/ecc.ca.key.pem ./CA/info.txt > ./CA/signature.sig"
     ],
                     shell=True,
                     stdout=subprocess.PIPE)
@@ -128,13 +129,14 @@ def bin_to_ascii(file):
     f = open(file, "rb")
     data = f.read()
     f.close()
-    return (str(binascii.b2a_base64(data)))
+    return base64.b64encode(data).decode()
 
 
 def create_certificate(nomEtPrenom, institute, info):
     create_signature(info)
     create_timespamp(info)
     signatureAscii = bin_to_ascii("./CA/signature.sig")
+    print("------\n", signatureAscii)
     create_qrcode(signatureAscii)
     generate_text_image(nomEtPrenom, institute)
     combine_image()
