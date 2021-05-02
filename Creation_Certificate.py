@@ -19,13 +19,12 @@ def generate_text_image(identify,
                         institute):  # Generate text for certificate titile
     texte_ligne = "Certificate of success | issued to {} {}".format(
         identify, institute)
-
-    Process = subprocess.Popen([
+    print(texte_ligne)
+    Process = subprocess.Popen(
         'curl -o texte.png "http://chart.apis.google.com/chart" --data-urlencode "chst=d_text_outline" --data-urlencode "chld=000000|56|h|FFFFFF|b|{}"'
-        .format(texte_ligne)
-    ],
-                               shell=True,
-                               stdout=subprocess.PIPE)
+        .format(texte_ligne),
+        shell=True,
+        stdout=subprocess.PIPE)
 
     (result, ignorer) = Process.communicate()
     if Process.returncode == 0:
@@ -41,7 +40,7 @@ def combine_image():
     ],
                                shell=True,
                                stdout=subprocess.PIPE)
-    
+
     (result, ignorer) = Process.communicate()
     if Process.returncode == 0:
         print("Composite image to background...")
@@ -54,8 +53,8 @@ def combine_qrcode():
     Process = subprocess.Popen([
         'mogrify -resize 210x210 ./images/qrcode.png && composite -geometry +1418+934 ./images/qrcode.png combinaison.png attestation.png',
     ],
-                    shell=True,
-                    stdout=subprocess.PIPE)
+                               shell=True,
+                               stdout=subprocess.PIPE)
 
     (result, ignorer) = Process.communicate()
     if Process.returncode == 0:
@@ -74,8 +73,8 @@ def create_signature(info):
     Process = subprocess.Popen([
         "openssl dgst -sha256 -sign CA/ecc.ca.key.pem ./CA/info.txt > ./CA/signature.sig"
     ],
-                    shell=True,
-                    stdout=subprocess.PIPE)
+                               shell=True,
+                               stdout=subprocess.PIPE)
 
     (result, ignorer) = Process.communicate()
     if Process.returncode == 0:
@@ -93,8 +92,8 @@ def create_timespamp(info):
     ProcessTSQ = subprocess.Popen([
         "openssl ts -query -data ./ts/timestamp_info.txt -no_nonce -sha512 -cert -out ./ts/ts_query.tsq"
     ],
-                       shell=True,
-                       stdout=subprocess.PIPE)
+                                  shell=True,
+                                  stdout=subprocess.PIPE)
 
     (result, ignorer) = ProcessTSQ.communicate()
 
@@ -106,8 +105,8 @@ def create_timespamp(info):
     ProcessTSR = subprocess.Popen([
         'curl -H "Content-Type: application/timestamp-query" --data-binary "@./ts/ts_query.tsq" https://freetsa.org/tsr > ./ts/ts_respond.tsr'
     ],
-                       shell=True,
-                       stdout=subprocess.PIPE)
+                                  shell=True,
+                                  stdout=subprocess.PIPE)
     (result, ignorer) = ProcessTSR.communicate()
 
     if ProcessTSR.returncode == 0:
@@ -125,24 +124,25 @@ def make_full_char_info(data):  # generate 64 character
     return data
 
 
-def bin_to_ascii(file):
+def bin_to_base64(file):
     f = open(file, "rb")
     data = f.read()
     f.close()
-    return base64.b64encode(data).decode()
+    return base64.b64encode(data).decode('ascii')
 
 
 def create_certificate(nomEtPrenom, institute, info):
     create_signature(info)
     create_timespamp(info)
-    signatureAscii = bin_to_ascii("./CA/signature.sig")
-    print("------\n", signatureAscii)
+    signatureAscii = bin_to_base64("./CA/signature.sig")
+    print("----\n", len(signatureAscii))
     create_qrcode(signatureAscii)
     generate_text_image(nomEtPrenom, institute)
     combine_image()
     combine_qrcode()
 
-    timestampAscii = bin_to_ascii("./ts/ts_respond.tsr")
+    timestampAscii = bin_to_base64("./ts/ts_respond.tsr")
+    print("----\n", len(timestampAscii))
     messageStegano = signatureAscii + timestampAscii
     img = Image.open("attestation.png")
     cacher(img, messageStegano)

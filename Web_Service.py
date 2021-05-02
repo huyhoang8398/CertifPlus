@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from bottle import route, run, template, request, response
 from Creation_Certificate import create_certificate
+from Verification_Certificate import verify_certificate
 
 @route('/creation', method='POST')
 def creation_attestation():
@@ -8,11 +9,9 @@ def creation_attestation():
     contenu_identite = request.forms.get('identite')
     contenu_intitule_certification = request.forms.get('intitule_certif')
     info = request.forms.get('info')
-    status = create_certificate(contenu_identite, contenu_intitule_certification, info)
-
-
+    result = create_certificate(contenu_identite, contenu_intitule_certification, info)
     response.set_header('Content-type', 'text/plain')
-    return "ok"
+    return result
 
 
 @route('/verification', method='POST')
@@ -20,7 +19,8 @@ def verification_attestation():
     contenu_image = request.files.get('image')
     contenu_image.save('attestation_a_verifier.png', overwrite=True)
     response.set_header('Content-type', 'text/plain')
-    return "ok!"
+    status = verify_certificate()
+    return status
 
 
 @route('/fond')
