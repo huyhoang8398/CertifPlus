@@ -33,7 +33,7 @@ def verify_timestamp(data):
                                   shell=True,
                                   stdout=subprocess.PIPE)
 
-    (result, ignorer) = ProcessTSQ.communicate()
+    (output, error) = ProcessTSQ.communicate()
     if ProcessTSQ.returncode == 0:
         print("Create timestamp-query")
     else:
@@ -45,9 +45,9 @@ def verify_timestamp(data):
     ],
                                   shell=True,
                                   stdout=subprocess.PIPE)
-    (result, ignorer) = ProcessTSR.communicate()
+    (output, error) = ProcessTSR.communicate()
 
-    if ProcessTSR.returncode == 0 and result.decode() == 'Verification: OK\n':
+    if ProcessTSR.returncode == 0 and output.decode() == 'Verification: OK\n':
         print("Verify success timestamp")
         return True
     else:
@@ -62,8 +62,8 @@ def verify_signature(data):
                                shell=True,
                                stdout=subprocess.PIPE)
 
-    (result, ignorer) = Process.communicate()
-    if Process.returncode == 0 and result.decode() == 'Verified OK\n':
+    (output, error) = Process.communicate()
+    if Process.returncode == 0 and output.decode() == 'Verified OK\n':
         print("verify success signature")
         return True
     else:
@@ -98,7 +98,7 @@ def get_data_from_stegano():
 def verify_certificate():
     get_qrcode_png()
     get_data_from_qrcode()
-    signature, timeStamp = get_data_from_stegano()
+    _, _= get_data_from_stegano()
     if (verify_signature("verify_sig_qrcode.sig") == True) and (
             verify_timestamp("verify_timestamp.tsr")
             == True) and (verify_signature("verify_signature_stegno.sig")

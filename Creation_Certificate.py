@@ -17,7 +17,7 @@ def create_qrcode(data):  #data is the signature
 
 def generate_text_image(identify,
                         institute):  # Generate text for certificate titile
-    texte_ligne = "Certificate of success | issued to {} {}".format(
+    texte_ligne = "Attestation de reussite|delivree a {} {}".format(
         identify, institute)
     print(texte_ligne)
     Process = subprocess.Popen(
@@ -26,7 +26,7 @@ def generate_text_image(identify,
         shell=True,
         stdout=subprocess.PIPE)
 
-    (result, ignorer) = Process.communicate()
+    (output, error) = Process.communicate()
     if Process.returncode == 0:
         print("Create text image")
         return True
@@ -41,7 +41,7 @@ def combine_image():
                                shell=True,
                                stdout=subprocess.PIPE)
 
-    (result, ignorer) = Process.communicate()
+    (output, error) = Process.communicate()
     if Process.returncode == 0:
         print("Composite image to background...")
         return True
@@ -56,7 +56,7 @@ def combine_qrcode():
                                shell=True,
                                stdout=subprocess.PIPE)
 
-    (result, ignorer) = Process.communicate()
+    (output, error) = Process.communicate()
     if Process.returncode == 0:
         print("Composite qrcode to background...")
         return True
@@ -76,11 +76,14 @@ def create_signature(info):
                                shell=True,
                                stdout=subprocess.PIPE)
 
-    (result, ignorer) = Process.communicate()
+    (output, error) = Process.communicate()
+
     if Process.returncode == 0:
         print("create signature")
         return True
     else:
+        print("-------------------\nWrong password")
+        print("\nCreate certificate failed")
         return False
 
 
@@ -92,7 +95,7 @@ def create_timespamp(signature):
                                   shell=True,
                                   stdout=subprocess.PIPE)
 
-    (result, ignorer) = ProcessTSQ.communicate()
+    (output, error) = ProcessTSQ.communicate()
 
     if ProcessTSQ.returncode == 0:
         print("Create timestamp-query")
@@ -104,7 +107,7 @@ def create_timespamp(signature):
     ],
                                   shell=True,
                                   stdout=subprocess.PIPE)
-    (result, ignorer) = ProcessTSR.communicate()
+    (output, error) = ProcessTSR.communicate()
 
     if ProcessTSR.returncode == 0:
         print("create timestamp ts_respond")
@@ -129,18 +132,18 @@ def bin_to_base64(file):
 
 
 def create_certificate(nomEtPrenom, institute, info):
-    create_signature(info)
-    create_timespamp("./CA/signature.sig")
-    signatureAscii = bin_to_base64("./CA/signature.sig")
-    print("----\n", len(signatureAscii))
-    create_qrcode(signatureAscii)
-    generate_text_image(nomEtPrenom, institute)
-    combine_image()
-    combine_qrcode()
+    if(create_signature(info)):
+        create_timespamp("./CA/signature.sig")
+        signatureAscii = bin_to_base64("./CA/signature.sig")
+        print("----\n", len(signatureAscii))
+        create_qrcode(signatureAscii)
+        generate_text_image(nomEtPrenom, institute)
+        combine_image()
+        combine_qrcode()
 
-    timestampAscii = bin_to_base64("./ts/ts_respond.tsr")
-    print("----\n", len(timestampAscii))
-    messageStegano = signatureAscii + timestampAscii
-    img = Image.open("attestation.png")
-    cacher(img, messageStegano)
-    img.save("attestation.png")
+        timestampAscii = bin_to_base64("./ts/ts_respond.tsr")
+        print("----\n", len(timestampAscii))
+        messageStegano = signatureAscii + timestampAscii
+        img = Image.open("attestation.png")
+        cacher(img, messageStegano)
+        img.save("attestation.png")
