@@ -71,7 +71,7 @@ def create_signature(info):
     file.close()
 
     Process = subprocess.Popen([
-        "openssl dgst -sha256 -sign CA/ecc.ca.key.pem ./CA/info.txt > ./CA/signature.sig"
+        "openssl dgst -sha256 -sign CA/enc.ecc.ca.key.pem ./CA/info.txt > ./CA/signature.sig"
     ],
                                shell=True,
                                stdout=subprocess.PIPE)
