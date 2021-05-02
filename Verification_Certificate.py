@@ -49,7 +49,7 @@ def verify_timestamp(data):
 
     if ProcessTSR.returncode == 0 and result.decode() == 'Verification: OK\n':
         print("Verify success timestamp")
-        # return True
+        return True
     else:
         return False
 
@@ -92,7 +92,6 @@ def get_data_from_stegano():
     f.write(signature)
     f.close()
 
-
     return signature, timeStamp
 
 
@@ -100,6 +99,8 @@ def verify_certificate():
     get_qrcode_png()
     get_data_from_qrcode()
     signature, timeStamp = get_data_from_stegano()
-    verify_signature("verify_sig_qrcode.sig")
-    verify_timestamp("verify_timestamp.tsr")
-    verify_signature("verify_signature_stegno.sig")
+    if (verify_signature("verify_sig_qrcode.sig") == True) and (
+            verify_timestamp("verify_timestamp.tsr")
+            == True) and (verify_signature("verify_signature_stegno.sig")
+                          == True):
+        print("Verify success certificate")
