@@ -40,7 +40,7 @@ def verify_timestamp(data):
         print("Create timestamp-query failed")
 
     ProcessTSR = subprocess.Popen([
-        "openssl ts -verify -in {} -queryfile ./ts/ts_query.tsq -CAfile ./ts/cacert.pem -untrusted ./ts/tsa.crt"
+        "openssl ts -verify -in {} -queryfile ./ts/ts_query_verify.tsq -CAfile ./ts/cacert.pem -untrusted ./ts/tsa.crt"
         .format(data)
     ],
                                   shell=True,
