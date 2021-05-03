@@ -8,9 +8,9 @@ def creation_attestation():
 
     contenu_identite = request.forms.get('identite')
     contenu_intitule_certification = request.forms.get('intitule_certif')
-    info = request.forms.get('info')
-    result = create_certificate(contenu_identite, contenu_intitule_certification, info)
+    result = create_certificate(contenu_identite, contenu_intitule_certification)
     response.set_header('Content-type', 'text/plain')
+    print("create certificate successfully")
     return result
 
 
@@ -20,6 +20,7 @@ def verification_attestation():
     contenu_image.save('attestation_a_verifier.png', overwrite=True)
     response.set_header('Content-type', 'text/plain')
     status = verify_certificate()
+    print("Verify certificate successfully")
     return status
 
 

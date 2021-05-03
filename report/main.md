@@ -69,3 +69,16 @@ In this project, we are suppose to implement a distribution processsecure electr
 ## 2.2 Methodologies
 
 ### A. Creating certficate
+
+An user will request CertifPlus for creating a certificate by providing his/her informations containing Last name and First name, Institue and a signature data (more details will be described in the analysis risk part)
+
+First of all, we sign their signature using `SHA-256` with binary file output and using encrypted CA key.
+
+
+
+
+
+
+
+
+

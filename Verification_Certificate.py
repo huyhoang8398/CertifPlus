@@ -28,7 +28,7 @@ def base64_to_bin(data):
 
 def verify_timestamp(data):
     ProcessTSQ = subprocess.Popen([
-        "openssl ts -query -data ./verify_signature_stegno.sig -no_nonce -sha512 -cert -out ./ts/ts_query_verify.tsq"
+        "openssl ts -query -data ./verify_sig_qrcode.sig -no_nonce -sha512 -cert -out ./ts/ts_query_verify.tsq"
     ],
                                   shell=True,
                                   stdout=subprocess.PIPE)
@@ -56,7 +56,7 @@ def verify_timestamp(data):
 
 def verify_signature(data):
     Process = subprocess.Popen([
-        "openssl dgst -verify CA/ecc.ca.pubkey.pem -signature {} CA/info.txt".
+        "openssl dgst -verify CA/ecc.ca.pubkey.pem -signature {} info.txt".
         format(data)
     ],
                                shell=True,
@@ -72,35 +72,31 @@ def verify_signature(data):
 
 def get_data_from_stegano():
     image = Image.open("attestation_a_verifier.png")
-    fullMessage = recuperer(image, 7420)
+    fullMessage = recuperer(image, 7388)
     # print(fullMessage)
-    signature = fullMessage[:96]
-    timeStamp = fullMessage[96:]
+    infoBlock = fullMessage[:64]
+    timeStamp = fullMessage[64:]
 
-    print(len(signature))
+    print(len(infoBlock))
     print(len(timeStamp))
     timeStamp = base64_to_bin(timeStamp)
-    signature = base64_to_bin(signature)
     print(len(timeStamp))
-    print(len(signature))
 
     f = open("verify_timestamp.tsr", "wb")
     f.write(timeStamp)
     f.close()
 
-    f = open("verify_signature_stegno.sig", "wb")
-    f.write(signature)
+    f = open("info.txt", "w")
+    f.write(infoBlock)
     f.close()
 
-    return signature, timeStamp
+    return infoBlock, timeStamp
 
 
 def verify_certificate():
     get_qrcode_png()
     get_data_from_qrcode()
-    _, _= get_data_from_stegano()
-    if (verify_signature("verify_sig_qrcode.sig") == True) and (
-            verify_timestamp("verify_timestamp.tsr")
-            == True) and (verify_signature("verify_signature_stegno.sig")
-                          == True):
-        print("Verify success certificate")
+    _, _ = get_data_from_stegano()
+    if (verify_signature("verify_sig_qrcode.sig")
+            == True) and (verify_timestamp("verify_timestamp.tsr") == True):
+        return "Verify success certificate"

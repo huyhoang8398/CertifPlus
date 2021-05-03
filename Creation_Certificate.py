@@ -131,11 +131,16 @@ def bin_to_base64(file):
     return base64.b64encode(data).decode('ascii')
 
 
-def create_certificate(nomEtPrenom, institute, info):
-    if(create_signature(info)):
+def create_certificate(nomEtPrenom, institute):
+    signature = nomEtPrenom + institute
+    print(signature)
+    if(create_signature(signature)):
         create_timespamp("./CA/signature.sig")
         signatureAscii = bin_to_base64("./CA/signature.sig")
-        print("----\n", len(signatureAscii))
+        f = open("./CA/info.txt", "r")
+        infoBlock = f.read()
+        f.close()
+        print("----\n", len(infoBlock))
         create_qrcode(signatureAscii)
         generate_text_image(nomEtPrenom, institute)
         combine_image()
@@ -143,7 +148,8 @@ def create_certificate(nomEtPrenom, institute, info):
 
         timestampAscii = bin_to_base64("./ts/ts_respond.tsr")
         print("----\n", len(timestampAscii))
-        messageStegano = signatureAscii + timestampAscii
+        messageStegano = infoBlock + timestampAscii
         img = Image.open("attestation.png")
         cacher(img, messageStegano)
         img.save("attestation.png")
+        return "Create certificate successfully"
