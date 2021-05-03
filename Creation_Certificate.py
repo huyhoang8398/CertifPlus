@@ -2,11 +2,9 @@ import subprocess
 import base64
 from typing import Protocol
 import qrcode
-import os
 from PIL import Image
 from subprocess import Popen, PIPE
 from Creation_Stegano import cacher
-import binascii
 
 
 def create_qrcode(data):  #data is the signature
@@ -90,7 +88,8 @@ def create_signature(info):
 def create_timespamp(signature):
 
     ProcessTSQ = subprocess.Popen([
-        "openssl ts -query -data {} -no_nonce -sha512 -cert -out ./ts/ts_query.tsq" .format(signature)
+        "openssl ts -query -data {} -no_nonce -sha512 -cert -out ./ts/ts_query.tsq"
+        .format(signature)
     ],
                                   shell=True,
                                   stdout=subprocess.PIPE)
@@ -134,7 +133,7 @@ def bin_to_base64(file):
 def create_certificate(nomEtPrenom, institute):
     signature = nomEtPrenom + institute
     print(signature)
-    if(create_signature(signature)):
+    if (create_signature(signature)):
         create_timespamp("./CA/signature.sig")
         signatureAscii = bin_to_base64("./CA/signature.sig")
         f = open("./CA/info.txt", "r")
@@ -153,3 +152,4 @@ def create_certificate(nomEtPrenom, institute):
         cacher(img, messageStegano)
         img.save("attestation.png")
         return "Create certificate successfully"
+    return "Create certificate failed"

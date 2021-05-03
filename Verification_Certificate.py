@@ -99,4 +99,4 @@ def verify_certificate():
     _, _ = get_data_from_stegano()
     if (verify_signature("verify_sig_qrcode.sig")
             == True) and (verify_timestamp("verify_timestamp.tsr") == True):
-        return "Verify success certificate"
+        return "Verify certificate successfully"
