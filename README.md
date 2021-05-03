@@ -22,7 +22,7 @@ Run the `init.sh` script to generate all the CA, ts and images needed in this pr
 
 We create a client script providing option for user (run `client.sh`)
 
-![Client script](client.png)
+![Client script](./images/client.png)
 
 **Example**
 ```bash
