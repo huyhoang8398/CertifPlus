@@ -3,12 +3,14 @@ from bottle import route, run, template, request, response
 from Creation_Certificate import create_certificate
 from Verification_Certificate import verify_certificate
 
+
 @route('/creation', method='POST')
 def creation_attestation():
 
     contenu_identite = request.forms.get('identite')
     contenu_intitule_certification = request.forms.get('intitule_certif')
-    result = create_certificate(contenu_identite, contenu_intitule_certification)
+    result = create_certificate(contenu_identite,
+                                contenu_intitule_certification)
     response.set_header('Content-type', 'text/plain')
     print("create certificate successfully")
     return result
@@ -32,4 +34,5 @@ def recuperer_fond():
     descripteur_fichier.close()
     return contenu_fichier
 
-run(host='0.0.0.0',port=8080,debug=True)
+
+run(host='0.0.0.0', port=8080, debug=True)
